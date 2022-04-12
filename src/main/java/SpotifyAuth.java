@@ -26,7 +26,7 @@ public class SpotifyAuth {
             .build();
 
     private final AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
-            .scope("user-top-read")
+            .scope("user-top-read user-library-read")
             .build();
 
     public void authorizationCodeUri_Sync() {

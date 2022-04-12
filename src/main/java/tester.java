@@ -3,13 +3,16 @@ import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
 import se.michaelthelin.spotify.model_objects.specification.Artist;
 import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.Track;
 import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
 import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
 import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class tester {
 
@@ -21,48 +24,43 @@ public class tester {
 
 
         SpotifyApi api = spotifyAuth.spotifyApi;
-        var artists = api.getUsersTopArtists().build();
-        try {
-            Paging<Artist> artistPaging = artists.execute();
-            Arrays.stream(artistPaging.getItems()).forEach(a -> System.out.println(a.toString()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SpotifyWebApiException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            e.printStackTrace();
+
+
+        List<Track> tracks = getTracksFromTop(api , 500);
+
+//        tracks.forEach(track -> {
+//            System.out.println("Artist: " + Arrays.stream(track.getArtists()).map() + ", Song name: " + track.getName());
+//        });
+        for (Track track : tracks) {
+            System.out.println("track");
+            System.out.println(track.getName());
+//            for (:) {
+
+            }
         }
-        System.out.println();
-          final GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = api.getCurrentUsersProfile()
-                .build();
 
-//            try {
-//                final User user = getCurrentUsersProfileRequest.execute();
-//
-//                System.out.println("Display name: " + user.getDisplayName());
-//            } catch (IOException | SpotifyWebApiException | ParseException e) {
-//                System.out.println("Error: " + e.getMessage());
-//            }
 
-//        spotifyAuth.clientCredentials_Sync();
-//
-//        SpotifyApi spotifyApi = spotifyAuth.spotifyApi;
-//
-//        GetArtistRequest artistRequest = spotifyApi.getArtist("5JbXKReqHxzCVIrHTIvSIT").build();
-//
-//        try {
-//            Artist rucci = artistRequest.execute();
-//
-//            System.out.println(rucci.toString());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (SpotifyWebApiException e) {
-//            e.printStackTrace();
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
+
+    public static List<Track> getTracksFromTop(SpotifyApi api, Integer amount) {
+
+        List<Track> returnList = new ArrayList<>();
+        for (int i = 0; i <= (amount / 10)+1; i++) {
+            var request = api.getUsersTopTracks()
+                    .offset(i * 100)
+                    .build();
+//            System.out.println("here " + i);
+            try {
+                Paging<Track> artistPaging = request.execute();
+                Track[] tracksArray = artistPaging.getItems();
+                for (Track track:tracksArray) {
+                    System.out.println(track.getName() );
+                }
+                returnList.addAll(Arrays.asList(tracksArray));
+            } catch (IOException | SpotifyWebApiException | ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        return returnList;
     }
 }
 
