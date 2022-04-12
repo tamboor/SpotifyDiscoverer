@@ -1,57 +1,63 @@
+import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.SpotifyHttpManager;
 import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
-import se.michaelthelin.spotify.model_objects.credentials.ClientCredentials;
-import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
+import se.michaelthelin.spotify.model_objects.credentials.AuthorizationCodeCredentials;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeRequest;
+import se.michaelthelin.spotify.requests.authorization.authorization_code.AuthorizationCodeUriRequest;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
+import java.net.*;
+import java.util.Scanner;
 
 public class SpotifyAuth {
     final String SPOTIFY_CLIENT_ID = "e5cec03b64614ccda237a3cef93c392d";
+
+    //TODO: move to enviromental value
     final String SPOTIFY_SECRET = "c3f46c9f3e6d4eec8989cbdadc6c9dbd";
 
-    SpotifyApi spotifyApi = SpotifyApi.builder()
+
+    private final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080");
+
+    public SpotifyApi spotifyApi = new SpotifyApi.Builder()
             .setClientId(SPOTIFY_CLIENT_ID)
             .setClientSecret(SPOTIFY_SECRET)
+            .setRedirectUri(redirectUri)
             .build();
 
-    ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials()
+    private final AuthorizationCodeUriRequest authorizationCodeUriRequest = spotifyApi.authorizationCodeUri()
+            .scope("user-top-read")
             .build();
 
+    public void authorizationCodeUri_Sync() {
+        final URI uri = authorizationCodeUriRequest.execute();
 
-    public void clientCredentials_Sync() {
+        System.out.println("URI: " + uri.toString());
+
+        Scanner myObj = new Scanner(System.in);
+            final AuthorizationCodeRequest authorizationCodeRequest = spotifyApi.authorizationCode(myObj.nextLine())
+                .build();
+
+
+        final AuthorizationCodeCredentials authorizationCodeCredentials;
         try {
-            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+            authorizationCodeCredentials = authorizationCodeRequest.execute();
+            System.out.println(authorizationCodeCredentials.getAccessToken());
+//            spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
+//            spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
 
-            // Set access token for further "spotifyApi" object usage
-            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
 
-            System.out.println("Expires in: " + clientCredentials.getExpiresIn());
-        } catch (IOException | SpotifyWebApiException | org.apache.hc.core5.http.ParseException e) {
-            System.out.println("Error: " + e.getMessage());
-        }
-    }
-
-    public void clientCredentials_Async() {
-        try {
-            final CompletableFuture<ClientCredentials> clientCredentialsFuture = clientCredentialsRequest.executeAsync();
-
-            // Thread free to do other tasks...
-
-            // Example Only. Never block in production code.
-            final ClientCredentials clientCredentials = clientCredentialsFuture.join();
-
-            // Set access token for further "spotifyApi" object usage
-            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-
-            System.out.println("Expires in: " + clientCredentials.getExpiresIn());
-        } catch (CompletionException e) {
-            System.out.println("Error: " + e.getCause().getMessage());
-        } catch (CancellationException e) {
-            System.out.println("Async operation cancelled.");
+            spotifyApi = SpotifyApi.builder()
+                    .setAccessToken(authorizationCodeCredentials.getAccessToken())
+                    .setRefreshToken(authorizationCodeCredentials.getRefreshToken())
+                    .setClientSecret(SPOTIFY_SECRET)
+                    .build();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SpotifyWebApiException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 }

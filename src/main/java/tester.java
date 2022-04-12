@@ -1,58 +1,73 @@
+import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
+import se.michaelthelin.spotify.exceptions.SpotifyWebApiException;
+import se.michaelthelin.spotify.model_objects.specification.Artist;
+import se.michaelthelin.spotify.model_objects.specification.Paging;
+import se.michaelthelin.spotify.model_objects.specification.User;
 import se.michaelthelin.spotify.requests.authorization.client_credentials.ClientCredentialsRequest;
+import se.michaelthelin.spotify.requests.data.artists.GetArtistRequest;
+import se.michaelthelin.spotify.requests.data.users_profile.GetCurrentUsersProfileRequest;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 public class tester {
 
 //    private final static St myClientId = "";
 
     public static void main(String[] args) {
+        SpotifyAuth spotifyAuth = new SpotifyAuth();
+        spotifyAuth.authorizationCodeUri_Sync();
 
-//        final String SPOTIFY_CLIENT_ID = "e5cec03b64614ccda237a3cef93c392d";
-//        final String SPOTIFY_SECRET = "c3f46c9f3e6d4eec8989cbdadc6c9dbd";
+
+        SpotifyApi api = spotifyAuth.spotifyApi;
+        var artists = api.getUsersTopArtists().build();
+        try {
+            Paging<Artist> artistPaging = artists.execute();
+            Arrays.stream(artistPaging.getItems()).forEach(a -> System.out.println(a.toString()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SpotifyWebApiException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        System.out.println();
+          final GetCurrentUsersProfileRequest getCurrentUsersProfileRequest = api.getCurrentUsersProfile()
+                .build();
+
+//            try {
+//                final User user = getCurrentUsersProfileRequest.execute();
 //
-//        SpotifyApi spotifyApi = SpotifyApi.builder()
-//                .setClientId(SPOTIFY_CLIENT_ID)
-//                .setClientSecret(SPOTIFY_SECRET)
-//                .build();
+//                System.out.println("Display name: " + user.getDisplayName());
+//            } catch (IOException | SpotifyWebApiException | ParseException e) {
+//                System.out.println("Error: " + e.getMessage());
+//            }
+
+//        spotifyAuth.clientCredentials_Sync();
 //
-//        ClientCredentialsRequest clientCredentialsRequest = spotifyApi.clientCredentials()
-//                .build();
-//    }
+//        SpotifyApi spotifyApi = spotifyAuth.spotifyApi;
 //
+//        GetArtistRequest artistRequest = spotifyApi.getArtist("5JbXKReqHxzCVIrHTIvSIT").build();
 //
-//    public static void clientCredentials_Sync() {
 //        try {
-//            final ClientCredentials clientCredentials = clientCredentialsRequest.execute();
+//            Artist rucci = artistRequest.execute();
 //
-//            // Set access token for further "spotifyApi" object usage
-//            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-//
-//            System.out.println("Expires in: " + clientCredentials.getExpiresIn());
-//        } catch (IOException | SpotifyWebApiException | ParseException e) {
-//            System.out.println("Error: " + e.getMessage());
+//            System.out.println(rucci.toString());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (SpotifyWebApiException e) {
+//            e.printStackTrace();
+//        } catch (ParseException e) {
+//            e.printStackTrace();
 //        }
+//
 //    }
-//
-//    public static void clientCredentials_Async() {
-//        try {
-//            final CompletableFuture<ClientCredentials> clientCredentialsFuture = clientCredentialsRequest.executeAsync();
-//
-//            // Thread free to do other tasks...
-//
-//            // Example Only. Never block in production code.
-//            final ClientCredentials clientCredentials = clientCredentialsFuture.join();
-//
-//            // Set access token for further "spotifyApi" object usage
-//            spotifyApi.setAccessToken(clientCredentials.getAccessToken());
-//
-//            System.out.println("Expires in: " + clientCredentials.getExpiresIn());
-//        } catch (CompletionException e) {
-//            System.out.println("Error: " + e.getCause().getMessage());
-//        } catch (CancellationException e) {
-//            System.out.println("Async operation cancelled.");
-//        }
-//    }
-}}
+    }
+}
+
+
+//https://open.spotify.com/artist/5JbXKReqHxzCVIrHTIvSIT?si=LIVdgeVcTEmndwHiDhzlcQ
 
 
 
