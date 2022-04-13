@@ -1,3 +1,5 @@
+package testing;
+
 import org.apache.hc.core5.http.ParseException;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
@@ -14,7 +16,7 @@ public class SpotifyAuth {
     final String SPOTIFY_CLIENT_ID = "e5cec03b64614ccda237a3cef93c392d";
 
     //TODO: move to enviromental value
-    final String SPOTIFY_SECRET = "c3f46c9f3e6d4eec8989cbdadc6c9dbd";
+    final String SPOTIFY_SECRET = System.getenv("SPOTIFY_SECRET");
 
 
     private final URI redirectUri = SpotifyHttpManager.makeUri("http://localhost:8080");
@@ -47,11 +49,13 @@ public class SpotifyAuth {
 //            spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
 
 
-            spotifyApi = SpotifyApi.builder()
-                    .setAccessToken(authorizationCodeCredentials.getAccessToken())
-                    .setRefreshToken(authorizationCodeCredentials.getRefreshToken())
-                    .setClientSecret(SPOTIFY_SECRET)
-                    .build();
+//            spotifyApi = SpotifyApi.builder()
+//                    .setAccessToken(authorizationCodeCredentials.getAccessToken())
+//                    .setRefreshToken(authorizationCodeCredentials.getRefreshToken())
+//                    .setClientSecret(SPOTIFY_SECRET)
+//                    .build();
+            spotifyApi.setAccessToken(authorizationCodeCredentials.getAccessToken());
+            spotifyApi.setRefreshToken(authorizationCodeCredentials.getRefreshToken());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (SpotifyWebApiException e) {
@@ -61,3 +65,13 @@ public class SpotifyAuth {
         }
     }
 }
+
+
+
+
+/*
+{
+name: nir
+schiff: cute
+}
+ */
