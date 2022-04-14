@@ -23,6 +23,11 @@ public class testRunner {
 
         System.out.println(authenticateURI);
 
+        Scanner scanner = new Scanner(System.in);
+
+        String code = scanner.nextLine();
+
+        SpotifyAuthManager.setTokens(api , code);
 
     }
 }
