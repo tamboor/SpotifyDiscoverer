@@ -41,6 +41,8 @@ public class SpotifyAuth {
                 .build();
 
 
+
+
         final AuthorizationCodeCredentials authorizationCodeCredentials;
         try {
             authorizationCodeCredentials = authorizationCodeRequest.execute();
@@ -66,12 +68,9 @@ public class SpotifyAuth {
     }
 }
 
+class Foo {
 
-
-
-/*
-{
-name: nir
-schiff: cute
 }
- */
+
+
+

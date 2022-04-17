@@ -1,8 +1,10 @@
 import auth.SpotifyAuthManager;
+import facade.AlbumFacade;
 import se.michaelthelin.spotify.SpotifyApi;
 import se.michaelthelin.spotify.SpotifyHttpManager;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class testRunner {
@@ -13,6 +15,9 @@ public class testRunner {
 
 
     public static void main(String[] args) {
+
+        System.out.println(SPOTIFY_SECRET);
+
         SpotifyApi api = SpotifyApi.builder()
                 .setClientId(SPOTIFY_CLIENT_ID)
                 .setClientSecret(SPOTIFY_SECRET)
@@ -27,7 +32,14 @@ public class testRunner {
 
         String code = scanner.nextLine();
 
-        SpotifyAuthManager.setTokens(api , code);
+        SpotifyAuthManager.setTokens(api, code);
+
+        AlbumFacade albumFacade = new AlbumFacade(api);
+//        albumFacade.getAlbumsByUserTopTracks(10 , 0);
+//        Arrays.stream(albumFacade.getAlbumsByUserTopTracks(10, 50))
+//                .forEach(System.out::println);
+        albumFacade.getUserAlbums().forEach(savedAlbum -> {System.out.println(savedAlbum.getAddedAt());
+            System.out.println(savedAlbum.getAlbum().getArtists() +" - " + savedAlbum.getAlbum().getName());});
 
     }
 }

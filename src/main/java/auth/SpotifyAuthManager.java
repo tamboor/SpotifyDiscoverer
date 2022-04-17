@@ -28,6 +28,7 @@ public class SpotifyAuthManager {
 
         try {
             AuthorizationCodeCredentials credentials = tokensRequest.execute();
+
             api.setAccessToken(credentials.getAccessToken());
             api.setRefreshToken(credentials.getRefreshToken());
             //TODO: handle all this shit(throw custom exception)
